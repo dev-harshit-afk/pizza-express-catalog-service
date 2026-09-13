@@ -20,7 +20,6 @@ export class CategoryController {
         }
 
         const { name, priceConfiguration, attributes } = req.body as Category;
-
         const category = await this.categoryService.create({
             name,
             priceConfiguration,
