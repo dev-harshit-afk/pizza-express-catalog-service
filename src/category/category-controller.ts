@@ -30,4 +30,5 @@ export class CategoryController {
 
         res.json({ id: category._id });
     }
+    async update(req: Request, res: Response, next: NextFunction) {}
 }
