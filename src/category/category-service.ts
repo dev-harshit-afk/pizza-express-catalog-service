@@ -9,18 +9,22 @@ export class CategoryService {
         return newCategory.save();
     }
 
-    async update(id:number,category:Category){
-        const updateCategory=await CategoryModel.findByIdAndUpdate(id,category,{returnDocument:"after"});
-        return updateCategory
+    async update(id: string, category: Category) {
+        const updateCategory = await CategoryModel.findByIdAndUpdate(
+            id,
+            category,
+            { returnDocument: "after" },
+        );
+        return updateCategory;
     }
-     async delete(id:number){
-        const deleteCategory=await CategoryModel.findByIdAndDelete(id);
+    async delete(id: string) {
+        const deleteCategory = await CategoryModel.findByIdAndDelete(id);
         return deleteCategory;
     }
-    async getAll(){
+    async getAll() {
         return await CategoryModel.find();
     }
-    async get(id:number){
+    async get(id: string) {
         return await categoryModel.findById(id);
     }
 }

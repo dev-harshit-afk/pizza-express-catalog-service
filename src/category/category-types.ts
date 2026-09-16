@@ -16,5 +16,5 @@ export interface Category {
     name: string;
     priceConfiguration: PriceConfiguration;
     attributes: Attribute[];
-    id?:number;
+    id?: string;
 }
