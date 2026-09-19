@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+    DeleteObjectCommand,
+    PutObjectCommand,
+    S3Client,
+} from "@aws-sdk/client-s3";
 import { FileData, FileStorage } from "../types/storage";
 import config from "config";
 
@@ -23,8 +27,12 @@ export class S3Storage implements FileStorage {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.client.send(new PutObjectCommand(objectParams));
     }
-    deleteFile(): Promise<void> {
-        throw new Error("Method not implemented.");
+    async deleteFile(fileName: string): Promise<void> {
+        const objectParams = {
+            Bucket: config.get<string>("s3.bucketName"),
+            Key: fileName,
+        };
+        await this.client.send(new DeleteObjectCommand(objectParams));
     }
     getObjectUri(): Promise<string> {
         throw new Error("Method not implemented.");
