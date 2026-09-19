@@ -1,5 +1,6 @@
+import { paginationLabels } from "../config/pagination";
 import productModel from "./product-model";
-import { Filter, Product } from "./product-types";
+import { Filter, PageQuery, Product } from "./product-types";
 
 export class ProductService {
     async create(product: Product) {
@@ -8,18 +9,18 @@ export class ProductService {
     }
 
     async getProductImage(productId: string) {
-        const product = await productModel.findById(productId);
+        const product: Product | null = await productModel.findById(productId);
         return product?.image;
     }
     async updateProduct(productId: string, product: Product) {
         return productModel.findOneAndUpdate({ _id: productId }, product);
     }
     async getProduct(productId: string) {
-        const product = await productModel.findById(productId);
+        const product: Product | null = await productModel.findById(productId);
         return product;
     }
 
-    async getProducts(q: string, filter: Filter) {
+    async getProducts(q: string, filter: Filter, pageQuery: PageQuery) {
         const searchQueryRegex = new RegExp(q, "i");
 
         const matchQuery = {
@@ -54,8 +55,10 @@ export class ProductService {
             },
         ]);
 
-        const result = aggregate.exec();
-
-        return result;
+        return productModel.aggregatePaginate(aggregate, {
+            page: pageQuery.page,
+            limit: pageQuery.limit,
+            customLabels: paginationLabels,
+        });
     }
 }

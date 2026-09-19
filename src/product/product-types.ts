@@ -14,10 +14,16 @@ export interface Product {
     categoryId: string;
     image: string;
     isPublished: boolean;
+    _id?: mongoose.Types.ObjectId;
 }
 
 export interface Filter {
     tenantId: string;
     isPublish: boolean;
     categoryId: mongoose.Types.ObjectId;
+}
+
+export interface PageQuery {
+    page: number;
+    limit: number;
 }
