@@ -13,10 +13,12 @@ import productValidator from "./product-validator";
 import { ProductController } from "./product-controller";
 import { ProductService } from "./product-service";
 import fileUpload from "express-fileupload";
+import { S3Storage } from "../common/services/S3Storage";
 
 const router = express.Router();
 const productService = new ProductService();
-const productController = new ProductController(productService);
+const storage = new S3Storage();
+const productController = new ProductController(productService, storage);
 
 const asyncWrapper = (requestHandler: RequestHandler) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -34,7 +36,14 @@ router.post(
     "/",
     authenticate,
     canAccess([Roles.ADMIN, Roles.MANAGER]),
-    fileUpload(),
+    fileUpload({
+        limits: { fileSize: 1024 * 500 },
+        abortOnLimit: true,
+        limitHandler: (req, res, next) => {
+            const error = createHttpError(400, "File size exceed the limits");
+            next(error);
+        },
+    }),
     productValidator,
     asyncWrapper(productController.create),
 );
