@@ -15,11 +15,16 @@ import { ProductService } from "./product-service";
 import fileUpload from "express-fileupload";
 import { S3Storage } from "../common/services/S3Storage";
 import updateProductValidator from "./update-product-validator";
+import logger from "../config/logger";
 
 const router = express.Router();
 const productService = new ProductService();
 const storage = new S3Storage();
-const productController = new ProductController(productService, storage);
+const productController = new ProductController(
+    productService,
+    storage,
+    logger,
+);
 
 const asyncWrapper = (requestHandler: RequestHandler) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -63,5 +68,7 @@ router.put(
     updateProductValidator,
     asyncWrapper(productController.update),
 );
+
+router.get("/", asyncWrapper(productController.index));
 
 export default router;

@@ -3,16 +3,19 @@ import { NextFunction, Response } from "express";
 import { Request } from "express-jwt";
 import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
-import { Product } from "./product-types";
+import { Filter, Product } from "./product-types";
 import { ProductService } from "./product-service";
 import { FileStorage } from "../common/types/storage";
 import { v4 as uuidv4 } from "uuid";
 import { UploadedFile } from "express-fileupload";
 import { Roles } from "../common/constants";
+import mongoose from "mongoose";
+import { Logger } from "winston";
 export class ProductController {
     constructor(
         private productService: ProductService,
         private storage: FileStorage,
+        private logger: Logger,
     ) {}
 
     create = async (req: Request, res: Response, next: NextFunction) => {
@@ -128,5 +131,32 @@ export class ProductController {
         await this.productService.updateProduct(productId, newProduct);
 
         return res.json({ id: productId });
+    };
+
+    index = async (req: Request, res: Response) => {
+        const { q, tenantId, categoryId, isPublish } = req.query;
+
+        const filter = {} as Filter;
+
+        if (isPublish === "true") {
+            filter.isPublish = true;
+        }
+        if (tenantId) filter.tenantId = tenantId as string;
+
+        if (
+            categoryId &&
+            mongoose.Types.ObjectId.isValid(categoryId as string)
+        ) {
+            filter.categoryId = new mongoose.Types.ObjectId(
+                categoryId as string,
+            );
+        }
+
+        const products = await this.productService.getProducts(
+            q as string,
+            filter,
+        );
+        this.logger.info("Fetched all products");
+        return res.json(products);
     };
 }
