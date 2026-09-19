@@ -14,4 +14,8 @@ export class ProductService {
     async updateProduct(productId: string, product: Product) {
         return productModel.findOneAndUpdate({ _id: productId }, product);
     }
+    async getProduct(productId: string) {
+        const product = await productModel.findById(productId);
+        return product;
+    }
 }
